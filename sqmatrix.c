@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "sqmatrix.h"
 
+// Dynamically creates a matrix using pointers of pointers of integers. 
 int** malloc_sq_matrix(size_t size) {
     int **matrix = (int **)malloc((size + 1) * sizeof(int *));
     if (matrix == NULL) {
@@ -19,6 +20,7 @@ int** malloc_sq_matrix(size_t size) {
             return NULL; 
         }
     }
+    // Sentinel value. Important for iterating through entries in matrix and knowing when to terminate loops. 
     matrix[size] = NULL;
     return matrix; 
 }
@@ -30,6 +32,7 @@ void free_sq_matrix(int **matrix) {
     free(matrix);
 }
 
+// For matrix initalization, generate random integers in the entries. 
 void rand_init_sq_matrix(int **matrix, size_t range) {
     for (size_t i = 0; matrix[i] != NULL; i++) {
         for (size_t j = 0; matrix[j] != NULL; j++) {
@@ -38,6 +41,7 @@ void rand_init_sq_matrix(int **matrix, size_t range) {
     }
 }
 
+// Basic matrix multiplication function. Requires an initialized product matrix to store entries.
 void mult_sq_matrices(int **pre_matrix, int **post_matrix, int **prod_matrix) {
     for (size_t i = 0; prod_matrix[i] != NULL; i++) {
         for (size_t j = 0; prod_matrix[j] != NULL; j++) {
