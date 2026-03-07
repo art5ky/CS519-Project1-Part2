@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "sqmatrix.h"
 
 // Dynamically creates a matrix using pointers of pointers of integers. 
 int** malloc_sq_matrix(size_t size) {

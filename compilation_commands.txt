@@ -1,0 +1,4 @@
+
+// For compiling IPC pipe program. 
+gcc ipc-pipe.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_pipe_program
+
