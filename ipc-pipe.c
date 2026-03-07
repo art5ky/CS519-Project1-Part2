@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 #include "headers/sqmatrix.h"
 #include "headers/benchmark.h"
 #include "headers/locks.h"
@@ -39,7 +40,7 @@ int main() {
 
     double total_time_sec = get_total_time(start, end);
    
-    print_stats(SIZE, 1, 1, total_time_sec);
+    print_stats(SIZE, 1, true, total_time_sec);
 
     free_sq_matrix(A);
     free_sq_matrix(B);

@@ -1,3 +1,7 @@
+/*  CS519, Spring 2026: Project 1 - Part 2
+    Written by: Arthur Levitsky
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 
