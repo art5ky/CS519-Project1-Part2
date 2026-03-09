@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 // Dynamically creates a matrix using pointers of pointers of integers. 
 int** malloc_sq_matrix(size_t size) {
@@ -55,6 +56,17 @@ void mult_sq_matrices(int **pre_matrix, int **post_matrix, int **prod_matrix) {
     }
 }
 
+// Similar to matrix multiplication except here we are performing row vector multiplication with a square matrix.
+void mult_sq_matrices_by_row(int row, int **pre_matrix, int **post_matrix, int **prod_matrix) {
+    for (size_t j = 0; prod_matrix[j] != NULL; j++) {
+        int sum = 0;
+        for (size_t k = 0; prod_matrix[k] != NULL; k++) {
+            sum += pre_matrix[row][k] * post_matrix[k][j];
+        }
+        prod_matrix[row][j] = sum;
+    }
+}
+
 void print_sq_matrix(int **matrix, const char *name) {
     printf("\nMatrix %s entries:\n", name);
     for (size_t i = 0; matrix[i] != NULL; i++) {
@@ -63,4 +75,15 @@ void print_sq_matrix(int **matrix, const char *name) {
         }
         printf("\n");
     }
+    printf("\n");
+}
+
+// Check to see if pre_matrix and post_matrix have the same entires and are the same matrix or not. 
+bool same_matrix(int **pre_matrix, int **post_matrix) {
+    for (size_t i = 0; pre_matrix[i] != NULL; i++) {
+        for (size_t j = 0; pre_matrix[j] != NULL; j++) {
+            if (pre_matrix[i][j] != post_matrix[i][j]) return false;
+        }
+    }
+    return true; 
 }

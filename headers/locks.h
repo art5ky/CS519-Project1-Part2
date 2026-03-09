@@ -5,6 +5,8 @@
 #ifndef LOCKS
 #define LOCKS
 
+int semaphore_create(int num_sems);
+void semaphore_destroy(int sem_id);
 void semaphore_init(int sem_id, int sem_num, int init_valve);
 void semaphore_release(int sem_id, int sem_num);
 void semaphore_reserve(int sem_id, int sem_num);
