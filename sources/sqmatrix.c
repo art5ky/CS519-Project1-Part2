@@ -9,12 +9,13 @@
 // Dynamically creates a matrix using pointers of pointers of integers. 
 int** malloc_sq_matrix(size_t size) {
     int **matrix = (int **)malloc((size + 1) * sizeof(int *));
+    int *row = (int *)malloc(size * size * sizeof(int));
     if (matrix == NULL) {
         perror("couldn't allocate memory for matrix row!");
         return NULL;
     }
     for (size_t i = 0; i < size; i++) {
-        matrix[i] = (int *)malloc(size * sizeof(int));
+        matrix[i] = &row[i * size];
         if (matrix[i] == NULL) {
             perror("couldn't allocate memory for matrix column! dellocating previous columns...");
             for (size_t j = 0; j < i; j++) {
@@ -30,9 +31,7 @@ int** malloc_sq_matrix(size_t size) {
 }
 
 void free_sq_matrix(int **matrix) {
-    for (size_t i = 0; matrix[i] != NULL; i++) {
-        free(matrix[i]);
-    }
+    free(matrix[0]);
     free(matrix);
 }
 
