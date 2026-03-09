@@ -61,7 +61,7 @@ void semaphore_reserve(int sem_id, int sem_num) {
   sops.sem_flg = 0; 
 
   if (semop(sem_id, &sops, 1) == -1) {
-    perror("Semaphore release failed!");
+    perror("Semaphore reserve failed!");
     exit(EXIT_FAILURE);
   }
 }

@@ -127,7 +127,7 @@ int main() {
     // Verify the matrix with sequential matrix multiplication up to 1000 MATRIX_SIZE.
     // If larger than 1000 MATRIX_SIZE, then use Freivald's algorithm for matrix correctness.
     bool verified;
-    if (MATRIX_SIZE < 1000) {
+    if (MATRIX_SIZE <= 1000) {
 
         int **D = malloc_sq_matrix(MATRIX_SIZE);
         rand_init_sq_matrix(D, 1);
@@ -136,11 +136,10 @@ int main() {
             fprintf(stderr, "Allocation for matrix D failed.");
             return 1;
         }
-
         mult_sq_matrices(A, B, D);
         verified = same_matrix(C, D);
-
     } else {
+        // CREATE FRIEVALDS LOGIC HERE ----------------------
         verified = false;
     }
    
