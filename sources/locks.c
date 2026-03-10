@@ -17,6 +17,7 @@ union semun {
                                 (Linux-specific) */
 };
 
+// Create one or more semaphores with read and write access.
 int semaphore_create(int num_sems) {
   int sem_id = semget(IPC_PRIVATE, num_sems, 0666 | IPC_CREAT);
   if (sem_id == -1) {
@@ -26,6 +27,7 @@ int semaphore_create(int num_sems) {
   return sem_id; 
 }
 
+// 
 void semaphore_destroy(int sem_id) {
   if (semctl(sem_id, 0, IPC_RMID) == -1) {
     perror("Semaphore removal failed!");
