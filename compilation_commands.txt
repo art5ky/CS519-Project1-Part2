@@ -3,3 +3,5 @@ gcc runnables/matrix-mult.c sources/sqmatrix.c sources/benchmark.c -o basic_matr
 
 // For compiling IPC pipe program using semaphore and single pipe.
 gcc runnables/ipc-pipe-sem.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_pipe_sem
+
+// For compiling IPC pipe program using ticket lock and single pipe. 
