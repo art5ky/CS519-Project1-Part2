@@ -1,6 +1,6 @@
 /*  CS519, Spring 2026: Project 1 - Part 2
     Written by: Arthur Levitsky
-    For implementing semaphores, man.archilinux.org reference was used.
+    For implementing semaphores and ticket lock, man.archilinux.org reference was used.
 */
 
 #include <stdlib.h>
@@ -8,6 +8,7 @@
 #include <sys/sem.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
+#include <stdatomic.h>
 
 union semun {
     int              val;    /* Value for SETVAL */
@@ -16,6 +17,16 @@ union semun {
     struct seminfo  *__buf;  /* Buffer for IPC_INFO
                                 (Linux-specific) */
 };
+
+typedef struct {
+  atomic_uint ticket; 
+  char padding[64];
+  atomic_uint now_serving;
+} ticket_lock_t; 
+
+ticket_lock_t* tl_create() {
+  return mmap(NULL, sizeof(ticket_lock_t), PROT_READ | PROD_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+}
 
 // Create one or more semaphores with read and write access.
 int semaphore_create(int num_sems) {
