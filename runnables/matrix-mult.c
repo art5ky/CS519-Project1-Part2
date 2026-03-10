@@ -10,8 +10,8 @@
 #include <time.h>
 #include <stdbool.h>
 
-#include "headers/sqmatrix.h"
-#include "headers/benchmark.h"
+#include "../headers/sqmatrix.h"
+#include "../headers/benchmark.h"
 
 #define MATRIX_SIZE 1000
 

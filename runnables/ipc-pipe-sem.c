@@ -12,11 +12,11 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 
-#include "headers/sqmatrix.h"
-#include "headers/benchmark.h"
-#include "headers/locks.h"
+#include "../headers/sqmatrix.h"
+#include "../headers/benchmark.h"
+#include "../headers/locks.h"
 
-#define MATRIX_SIZE 1000
+#define MATRIX_SIZE 4000
 #define WORKERS 0 // 0 means use logical processor count on the system.
 
 // Handles cases where if the pipe is full, child process segmented row data gets processed in multiple read calls.

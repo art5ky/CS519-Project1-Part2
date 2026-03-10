@@ -1,5 +1,5 @@
 // For compiling basic single process matrix multiplication.
-gcc matrix-mult.c sources/sqmatrix.c sources/benchmark.c -o basic_matrix_mult
+gcc runnables/matrix-mult.c sources/sqmatrix.c sources/benchmark.c -o basic_matrix_mult
 
 // For compiling IPC pipe program using semaphore and single pipe.
-gcc ipc-pipe-sem.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_pipe_sem
+gcc runnables/ipc-pipe-sem.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_pipe_sem
