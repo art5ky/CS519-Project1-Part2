@@ -8,86 +8,86 @@
 
 // Dynamically creates a matrix using pointers of pointers of integers. 
 int** malloc_sq_matrix(size_t size) {
-    int **matrix = (int **)malloc((size + 1) * sizeof(int *));
+    int **A = (int **)malloc((size + 1) * sizeof(int *));
     int *row = (int *)malloc(size * size * sizeof(int));
-    if (matrix == NULL || row == NULL) {
+    if (A == NULL || row == NULL) {
         perror("couldn't allocate memory for matrix or row!");
         return NULL;
     }
     for (size_t i = 0; i < size; i++) {
-        matrix[i] = &row[i * size];
+        A[i] = &row[i * size];
     }
     // Sentinel value. Important for iterating through entries in matrix and knowing when to terminate loops. 
-    matrix[size] = NULL;
-    return matrix; 
+    A[size] = NULL;
+    return A; 
 }
 
-void free_sq_matrix(int **matrix) {
-    free(matrix[0]);
-    free(matrix);
+void free_sq_matrix(int **A) {
+    free(A[0]);
+    free(A);
 }
 
 // For matrix initalization, generate random integers in the entries. 
-void rand_init_sq_matrix(int **matrix) {
-    for (size_t i = 0; matrix[i] != NULL; i++) {
-        for (size_t j = 0; matrix[j] != NULL; j++) {
-            matrix[i][j] = rand();
+void rand_init_sq_matrix(int **A) {
+    for (size_t i = 0; A[i] != NULL; i++) {
+        for (size_t j = 0; A[j] != NULL; j++) {
+            A[i][j] = rand();
         }
     }
 }
 
-void zero_init_sq_matrix(int **matrix) {
-    for (size_t i = 0; matrix[i] != NULL; i++) {
-        for (size_t j = 0; matrix[j] != NULL; j++) {
-            matrix[i][j] = 0;
+void zero_init_sq_matrix(int **A) {
+    for (size_t i = 0; A[i] != NULL; i++) {
+        for (size_t j = 0; A[j] != NULL; j++) {
+            A[i][j] = 0;
         }
     }
 }
 
 // Basic matrix multiplication function. Requires an initialized product matrix to store entries.
-void mult_sq_matrices_full(int **pre_matrix, int **post_matrix, int **prod_matrix) {
-    for (size_t i = 0; prod_matrix[i] != NULL; i++) {
-        for (size_t j = 0; prod_matrix[j] != NULL; j++) {
-            for (size_t k = 0; prod_matrix[k] != NULL; k++) {
-                prod_matrix[i][j] += pre_matrix[i][k] * post_matrix[k][j];
+void mult_sq_matrices_full(int **A, int **B, int **C) {
+    for (size_t i = 0; C[i] != NULL; i++) {
+        for (size_t j = 0; C[j] != NULL; j++) {
+            for (size_t k = 0; C[k] != NULL; k++) {
+                C[i][j] += A[i][k] * B[k][j];
             }
         }
     }
 }
 
-// Similar to mult_sq_matrices, except we are passing the row index as a parameter for pre_matrix. 
-void mult_sq_matrices_row(int row, int **pre_matrix, int **post_matrix, int **prod_matrix) {
-    for (size_t j = 0; prod_matrix[j] != NULL; j++) {
+// Similar to mult_sq_matrices, except we are passing the row index as a parameter for A. 
+void mult_sq_matrices_row(int row, int **A, int **B, int **C) {
+    for (size_t j = 0; C[j] != NULL; j++) {
         int sum = 0;
-        for (size_t k = 0; prod_matrix[k] != NULL; k++) {
-            sum += pre_matrix[row][k] * post_matrix[k][j];
+        for (size_t k = 0; C[k] != NULL; k++) {
+            sum += A[row][k] * B[k][j];
         }
-        prod_matrix[row][j] = sum;
+        C[row][j] = sum;
     }
 }
 
-void mult_sq_matrix_vec(int **matrix, int *post_vec, int *prod_vec) {
-    for (size_t j = 0; matrix[j] != NULL; j++) {
+void mult_sq_matrix_vec(int **A, int *v, int *A_v) {
+    for (size_t j = 0; A[j] != NULL; j++) {
         int sum = 0;
-        for (size_t k = 0; matrix[k] != NULL; k++) {
-            sum += matrix[j][k] * post_vec[k];
+        for (size_t k = 0; A[k] != NULL; k++) {
+            sum += A[j][k] * v[k];
         }
-        prod_vec[j] = sum;
+        A_v[j] = sum;
     }
 }
 
-void print_sq_matrix(int **matrix, const char *name) {
+void print_sq_matrix(int **A, const char *name) {
     printf("\nMatrix %s entries:\n", name);
-    for (size_t i = 0; matrix[i] != NULL; i++) {
-        for (size_t j = 0; matrix[j] != NULL; j++) {
-            printf("%3d ", matrix[i][j]);
+    for (size_t i = 0; A[i] != NULL; i++) {
+        for (size_t j = 0; A[j] != NULL; j++) {
+            printf("%3d ", A[i][j]);
         }
         printf("\n");
     }
     printf("\n");
 }
 
-// Check to see if pre_matrix and post_matrix have the same entires and are the same matrix or not. 
+// Check to see if A and B have the same entires and are the same matrix or not. 
 bool same_matrix(int **A, int **B) {
     for (size_t i = 0; A[i] != NULL; i++) {
         for (size_t j = 0; A[j] != NULL; j++) {

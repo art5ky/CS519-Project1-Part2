@@ -11,6 +11,6 @@
 
 void print_stats(int matrix_size, int num_processes, int verified, double elapsed);
 double get_total_time(struct timespec start, struct timespec end);
-bool verified_matrix(int **pre_matrix, int **post_matrix, int **check_matrix, size_t size);
+bool verified_matrix(int **A, int **B, int **C, size_t size);
 
 #endif

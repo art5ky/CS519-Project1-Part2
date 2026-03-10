@@ -39,8 +39,6 @@ int main() {
 
     double total_time_sec = get_total_time(start, end);
 
-    // Verify the matrix with sequential matrix multiplication up to 1000 MATRIX_SIZE.
-    // If larger than 1000 MATRIX_SIZE, then use Freivald's algorithm for matrix correctness.
     bool verified = verified_matrix(A, B, C, MATRIX_SIZE);
 
     //print_sq_matrix(A, "A");
