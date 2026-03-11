@@ -1,6 +1,6 @@
 /*  CS519, Spring 2026: Project 1 - Part 2
     Written by: Arthur Levitsky
-    Description: IPC using a single pipe and ticket lock spinlock
+    Description: IPC using a single pipe and semaphore (or ticket lock)
     for child process synchronization writing into the pipe.
 */
 
@@ -16,8 +16,10 @@
 #include "../headers/benchmark.h"
 #include "../headers/locks.h"
 
-#define MATRIX_SIZE 4000
+#define MATRIX_SIZE 6000
 #define WORKERS 0 // 0 means use logical processor count on the system.
+#define USE_TRANSPOSE true // if false, then perform regular parallel matrix multiplication.
+#define USE_TICKETLOCK true // if false, then use semaphore locking mechanism.
 
 // Handles cases where if the pipe is full, child process segmented row data gets processed in multiple read calls.
 void safe_read(int fd, void *buf, size_t count) {
@@ -42,6 +44,7 @@ int main() {
 
     int **A = malloc_sq_matrix(MATRIX_SIZE);
     int **B = malloc_sq_matrix(MATRIX_SIZE);
+    int **B_T = NULL; 
     int **C = malloc_sq_matrix(MATRIX_SIZE);
 
     if (A == NULL || B == NULL || C == NULL) {
@@ -53,6 +56,14 @@ int main() {
     rand_init_sq_matrix(B);
     zero_init_sq_matrix(C);
 
+    if (USE_TRANSPOSE) {
+        B_T = malloc_sq_matrix(MATRIX_SIZE);
+        if (B_T == NULL) {
+            fprintf(stderr, "Allocation for transposed matrix failed.");
+        }
+        transpose_sq_matrix(B, B_T);
+    }
+
     // Create the shared pipe among child processes.
     int pipefd[2];
     if (pipe(pipefd) == -1) {
@@ -60,8 +71,17 @@ int main() {
         return 1; 
     }
 
-    int sem_id = semaphore_create(1);
-    semaphore_init(sem_id, 0, 1);
+    ticket_lock_t *lock = NULL; 
+    int sem_id = -1;
+
+    // If using ticket lock, intialize it. Otherwise initialize a sempahore.
+    if (USE_TICKETLOCK) {
+        lock = tl_create(); 
+        if (!lock) return 1; 
+    } else {
+        sem_id = semaphore_create(1);
+        semaphore_init(sem_id, 0, 1);
+    }
 
     clock_gettime(CLOCK_MONOTONIC, &start);
 
@@ -82,15 +102,18 @@ int main() {
             end_row = start_row + base_rows + (i < remainder ? 1 : 0);
 
             for (int r = start_row; r < end_row; r++) {
-                mult_sq_matrices_row(r, A, B, C);
-
+                if (USE_TRANSPOSE) mult_sq_matrices_row_transposed(r, A, B_T, C);
+                else mult_sq_matrices_row(r, A, B, C);
+                
                 // Child reserves the lock and writes to the pipe buffer. It includes the row index and column of integers computed.
-                semaphore_reserve(sem_id, 0);
+                if (USE_TICKETLOCK) tl_acquire(lock);
+                else semaphore_reserve(sem_id, 0);
 
                 write(pipefd[1], &r, sizeof(int));
                 write(pipefd[1], C[r], MATRIX_SIZE * sizeof(int));
 
-                semaphore_release(sem_id, 0);
+                if (USE_TICKETLOCK) tl_release(lock);
+                else semaphore_release(sem_id, 0);
             }
 
             // Once child has computed all of its designated rows, close the writing file descriptor and exit successfully.
@@ -127,9 +150,7 @@ int main() {
     clock_gettime(CLOCK_MONOTONIC, &end);
     double total_time_sec = get_total_time(start, end);
 
-
-    // Verify the matrix with sequential matrix multiplication up to 1000 MATRIX_SIZE.
-    // If larger than 1000 MATRIX_SIZE, then use Freivald's algorithm for matrix correctness.
+    // If MATRIX_SIZE <= 1000, do single process matrix multiplication for verification otherwise use Frievalds algorithm.
     bool verified = verified_matrix(A, B, C, MATRIX_SIZE);
 
     //print_sq_matrix(A, "A");
@@ -138,7 +159,7 @@ int main() {
    
     print_stats(MATRIX_SIZE, num_workers, verified, total_time_sec);
 
-    semaphore_destroy(sem_id);
+    USE_TICKETLOCK ? tl_destroy(lock) : semaphore_destroy(sem_id);
     free_sq_matrix(A);
     free_sq_matrix(B);
     free_sq_matrix(C);

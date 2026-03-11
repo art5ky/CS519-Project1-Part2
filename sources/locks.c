@@ -9,6 +9,8 @@
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <stdatomic.h>
+#include <sys/mman.h>
+#include <stddef.h>
 
 union semun {
     int              val;    /* Value for SETVAL */
@@ -20,12 +22,37 @@ union semun {
 
 typedef struct {
   atomic_uint ticket; 
-  char padding[64];
+  char ticket_padding[64];
   atomic_uint now_serving;
+  char serving_padding[64];
 } ticket_lock_t; 
 
 ticket_lock_t* tl_create() {
-  return mmap(NULL, sizeof(ticket_lock_t), PROT_READ | PROD_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+  ticket_lock_t* lock = mmap(NULL, sizeof(ticket_lock_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+  if (lock == MAP_FAILED) {
+    perror("MMAP ticket lock memory page failed to create.");
+    return NULL; 
+  }
+  atomic_init(&lock->ticket, 0);
+  atomic_init(&lock->now_serving, 0);
+  return lock; 
+}
+
+void tl_destroy(ticket_lock_t* lock) {
+  if (lock) {
+    munmap(lock, sizeof(ticket_lock_t));
+  }
+}
+
+void tl_acquire(ticket_lock_t* lock) {
+  unsigned int my_ticket = atomic_fetch_add(&lock->ticket, 1);
+  while (atomic_load(&lock->now_serving) != my_ticket) {
+    __builtin_ia32_pause();
+  }
+}
+
+void tl_release(ticket_lock_t* lock) {
+  atomic_fetch_add(&lock->now_serving, 1);
 }
 
 // Create one or more semaphores with read and write access.

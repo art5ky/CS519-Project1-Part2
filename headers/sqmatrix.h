@@ -15,6 +15,8 @@ void zero_init_sq_matrix(int **A);
 void mult_sq_matrices_full(int **A, int **B, int **C);
 void mult_sq_matrices_row(int row, int **A, int **B, int **C);
 void mult_sq_matrix_vec(int **A, int *v, int *A_v);
+void transpose_sq_matrix(int **A, int **A_T);
+void mult_sq_matrices_row_transposed(int row, int **A, int **B, int **C);
 void print_sq_matrix(int **A, const char *name);
 bool same_matrix(int **A, int **B);
 bool frievalds_verify(int **A, int **B, int **C, size_t size);

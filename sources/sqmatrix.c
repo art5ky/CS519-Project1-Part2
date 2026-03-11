@@ -76,6 +76,26 @@ void mult_sq_matrix_vec(int **A, int *v, int *A_v) {
     }
 }
 
+void transpose_sq_matrix(int **A, int **A_T) {
+    for (size_t i = 0; A[i] != NULL; i++) {
+        for (size_t j = 0; A[j] != NULL; j++) {
+            A[j][i] = A_T[i][j];
+        }
+    }
+}
+
+// Similar to mult_sq_matrices_row, except this method of multiplication helps avoid CPU cache misses.
+// Originally, incrementing row means jumping a large amount of bytes in memory to obtain the data.
+void mult_sq_matrices_row_transposed(int row, int **A, int **B_T, int **C) {
+    for (size_t j = 0; C[j] != NULL; j++) {
+        int sum = 0;
+        for (size_t k = 0; C[k] != NULL; k++) {
+            sum += A[row][k] * B_T[j][k];
+        }
+        C[row][j] = sum;
+    }
+}
+
 void print_sq_matrix(int **A, const char *name) {
     printf("\nMatrix %s entries:\n", name);
     for (size_t i = 0; A[i] != NULL; i++) {
