@@ -11,15 +11,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "../headers/sqmatrix.h"
 #include "../headers/benchmark.h"
 #include "../headers/locks.h"
-
-#define MATRIX_SIZE 6000
-#define WORKERS 0 // 0 means use logical processor count on the system.
-#define USE_TRANSPOSE true // if false, then perform regular parallel matrix multiplication.
-#define USE_TICKETLOCK true // if false, then use semaphore locking mechanism.
 
 // Handles cases where if the pipe is full, child process segmented row data gets processed in multiple read calls.
 void safe_read(int fd, void *buf, size_t count) {
@@ -32,7 +28,51 @@ void safe_read(int fd, void *buf, size_t count) {
     }
 }
 
-int main() {
+// Instead of using macros, I made it easier to just include arguments into the pipe program.
+int arg_check(int argc, char *argv[]) {
+     if (argc <= 4) {
+        printf("Usage: %s [MATRIX_SIZE] [WORKERS] [USE_TRANSPOSE] [USE_TICKETLOCK]\n", argv[0]);
+        printf("---------------------------------------------------------------------------------\n");
+        printf("MATRIX_SIZE - Set a matrix size                                     (2 - 10000)\n");
+        printf("WORKERS - Set # of child processes. 0 for # of logical processors.  (0 - INT_MAX)\n");
+        printf("USE_TRANSPOSE - Transposes posterior matrix to avoid cache misses.  (true or false)\n");
+        printf("USE_TICKETLOCK - Uses TL spinlock instead of semaphore.             (true or false)\n");
+        exit(1); 
+    }
+
+    if (atoi(argv[1]) < 2 || atoi(argv[1]) > 10000) {
+        printf("Incompatible MATRIX_SIZE! (2 - 10000)\n");
+        exit(1); 
+    }
+
+    if (atoi(argv[2]) < 0) {
+        printf("Incompatible WORKERS! (0 - INT_MAX)\n");
+        exit(1); 
+    }
+
+    if (strcmp(argv[3], "true") != 0 && strcmp(argv[3], "false") != 0) {
+        printf("Incompatible USE_TRANSPOSE! (true or false)\n");
+        exit(1);
+    }
+
+    if (strcmp(argv[4], "true") != 0 && strcmp(argv[4], "false") != 0) {
+        printf("Incompatible USE_TICKETLOCK! (true or false)\n");
+        exit(1);
+    }
+}
+
+
+int main(int argc, char *argv[]) {
+    int MATRIX_SIZE, WORKERS;
+    bool USE_TRANSPOSE, USE_TICKETLOCK; 
+
+    arg_check(argc, argv);
+
+    MATRIX_SIZE = atoi(argv[1]);
+    WORKERS = atoi(argv[2]);
+    USE_TRANSPOSE = (strcmp(argv[3], "true") == 0);
+    USE_TICKETLOCK = (strcmp(argv[4], "true") == 0);
+
 
     srand(time(NULL));
     struct timespec start, end; 
