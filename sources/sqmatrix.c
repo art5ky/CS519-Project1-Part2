@@ -10,23 +10,16 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#define TILE_SIZE 64
-
 // Locally create a matrix with contiguous memory allocation.
 int** malloc_sq_matrix(size_t size) {
     size_t row_ptr_size = (size + 1) * sizeof(int*);
     size_t matrix_data_size = size * size * sizeof(int);
 
-    int **rows = (int **)malloc((size + 1) * sizeof(int *));
-    int *matrix_data = (int *)malloc(size * size * sizeof(int));
+    int **rows = (int **)malloc(row_ptr_size);
+    int *matrix_data = (int *)malloc(matrix_data_size);
     if (rows == NULL || matrix_data == NULL) {
         perror("couldn't allocate memory for matrix or row!");
         return NULL;
-    }
-
-    size_t page_size = sysconf(_SC_PAGESIZE);
-    for (size_t i = 0; i < matrix_data_size ; i += page_size) {
-        ((char*)matrix_data)[i] = 0; 
     }
 
     for (size_t i = 0; i < size; i++) {
@@ -47,11 +40,6 @@ int** malloc_sq_matrix_shared(size_t size) {
     if (rows == MAP_FAILED || matrix_data == MAP_FAILED) {
         perror("couldn't allocate memory for matrix or row!");
         return NULL;
-    }
-
-    size_t page_size = sysconf(_SC_PAGESIZE);
-    for (size_t i = 0; i < matrix_data_size ; i += page_size) {
-        ((char*)matrix_data)[i] = 0; 
     }
 
     for (size_t i = 0; i < size; i++) {

@@ -18,7 +18,7 @@
 #include "../headers/locks.h"
 
 void safe_read(int fd, void *buf, size_t count);
-int arg_check(int argc, char *argv[]);
+void arg_check(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     int MATRIX_SIZE, WORKERS;
@@ -106,8 +106,14 @@ int main(int argc, char *argv[]) {
                 if (USE_TICKETLOCK) tl_acquire(lock);
                 else semaphore_reserve(sem_id, 0);
 
-                write(pipefd[1], &r, sizeof(int));
-                write(pipefd[1], C[r], MATRIX_SIZE * sizeof(int));
+                if (write(pipefd[1], &r, sizeof(int)) != sizeof(int)) {
+                    perror("Child writing index to pipe failed!");
+                    exit(1);
+                }
+                if (write(pipefd[1], C[r], MATRIX_SIZE * sizeof(int)) != MATRIX_SIZE * sizeof(int)) {
+                    perror("Child writing matrix computation to pipe failed!");
+                    exit(1);
+                }
 
                 if (USE_TICKETLOCK) tl_release(lock);
                 else semaphore_release(sem_id, 0);
@@ -171,7 +177,7 @@ void safe_read(int fd, void *buf, size_t count) {
 }
 
 // Instead of using macros, I made it easier to just include arguments into the pipe program.
-int arg_check(int argc, char *argv[]) {
+void arg_check(int argc, char *argv[]) {
      if (argc <= 4) {
         printf("Usage: %s [MATRIX_SIZE] [WORKERS] [USE_TRANSPOSE] [USE_TICKETLOCK]\n", argv[0]);
         printf("---------------------------------------------------------------------------------\n");

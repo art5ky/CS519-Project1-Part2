@@ -13,7 +13,7 @@
 #include "../headers/sqmatrix.h"
 #include "../headers/benchmark.h"
 
-int arg_check(int argc, char *argv[]);
+void arg_check(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     int MATRIX_SIZE;
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Instead of using macros, I made it easier to just include arguments into the pipe program.
-int arg_check(int argc, char *argv[]) {
+void arg_check(int argc, char *argv[]) {
      if (argc <= 1) {
         printf("Usage: %s [MATRIX_SIZE]\n", argv[0]);
         printf("---------------------------------------------------------------------------------\n");

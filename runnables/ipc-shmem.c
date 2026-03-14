@@ -19,7 +19,7 @@
 #include "../headers/locks.h"
 
 void safe_read(int fd, void *buf, size_t count);
-int arg_check(int argc, char *argv[]);
+void arg_check(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     int MATRIX_SIZE, WORKERS;
@@ -130,7 +130,7 @@ void safe_read(int fd, void *buf, size_t count) {
 }
 
 // Instead of using macros, I made it easier to just include arguments into the pipe program.
-int arg_check(int argc, char *argv[]) {
+void arg_check(int argc, char *argv[]) {
      if (argc <= 3) {
         printf("Usage: %s [MATRIX_SIZE] [WORKERS] [USE_TRANSPOSE]\n", argv[0]);
         printf("---------------------------------------------------------------------------------\n");
