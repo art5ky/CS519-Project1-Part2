@@ -29,6 +29,6 @@ clean:
 
 help:
 	@echo "Available commands:"
-	@echo "  make         - Build all three programs"
-	@echo "  make clean   - Remove executables"
-	@echo "  make help    - Show this help"
+	@echo "  make         - Build ipc_pipe, ipc_shmem, and sp_mmult programs"
+	@echo "  make clean   - Delete ipc_pipe, ipc_shmem, and sp_mmult programs"
+	@echo "  make help    - Show commands to use"

@@ -1,2 +1,5 @@
 **/.vscode/
 build/
+ipc_pipe
+ipc_shmem
+sp_mmult
