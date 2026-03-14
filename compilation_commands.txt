@@ -4,6 +4,9 @@ gcc runnables/matrix-mult.c sources/sqmatrix.c sources/benchmark.c -o basic_matr
 // For compiling IPC pipe program using semaphore and single pipe.
 gcc runnables/ipc-pipe.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_pipe
 
+// For compiling IPC pipe program using semaphore and single pipe.
+gcc runnables/ipc-shmem.c sources/sqmatrix.c sources/benchmark.c sources/locks.c -o ipc_shmem
+
 // For perf recording
  sudo perf record -g -o <file name> <program name>
 

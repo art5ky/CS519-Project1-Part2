@@ -1,30 +1,76 @@
 /*  CS519, Spring 2026: Project 1 - Part 2
     Written by: Arthur Levitsky
+    Functions for handling matrix allocation and 
+    multiplication logic. 
 */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-// Dynamically creates a matrix using pointers of pointers of integers. 
+#define TILE_SIZE 64
+
+// Locally create a matrix with contiguous memory allocation.
 int** malloc_sq_matrix(size_t size) {
-    int **A = (int **)malloc((size + 1) * sizeof(int *));
-    int *row = (int *)malloc(size * size * sizeof(int));
-    if (A == NULL || row == NULL) {
+    size_t row_ptr_size = (size + 1) * sizeof(int*);
+    size_t matrix_data_size = size * size * sizeof(int);
+
+    int **rows = (int **)malloc((size + 1) * sizeof(int *));
+    int *matrix_data = (int *)malloc(size * size * sizeof(int));
+    if (rows == NULL || matrix_data == NULL) {
         perror("couldn't allocate memory for matrix or row!");
         return NULL;
     }
+
+    size_t page_size = sysconf(_SC_PAGESIZE);
+    for (size_t i = 0; i < matrix_data_size ; i += page_size) {
+        ((char*)matrix_data)[i] = 0; 
+    }
+
     for (size_t i = 0; i < size; i++) {
-        A[i] = &row[i * size];
+        rows[i] = &matrix_data[i * size];
     }
     // Sentinel value. Important for iterating through entries in matrix and knowing when to terminate loops. 
-    A[size] = NULL;
-    return A; 
+    rows[size] = NULL;
+    return rows; 
 }
+
+// Similar to malloc_sq_matrix except matrices are not local and are sharable among processes.
+int** malloc_sq_matrix_shared(size_t size) {
+    size_t row_ptr_size = (size + 1) * sizeof(int*);
+    size_t matrix_data_size = size * size * sizeof(int);
+
+    int **rows = mmap(NULL, row_ptr_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    int *matrix_data = mmap(NULL, matrix_data_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    if (rows == MAP_FAILED || matrix_data == MAP_FAILED) {
+        perror("couldn't allocate memory for matrix or row!");
+        return NULL;
+    }
+
+    size_t page_size = sysconf(_SC_PAGESIZE);
+    for (size_t i = 0; i < matrix_data_size ; i += page_size) {
+        ((char*)matrix_data)[i] = 0; 
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        rows[i] = &matrix_data[i * size];
+    }
+    // Sentinel value. Important for iterating through entries in matrix and knowing when to terminate loops. 
+    rows[size] = NULL;
+    return rows; 
+}
+
 
 void free_sq_matrix(int **A) {
     free(A[0]);
     free(A);
+}
+
+void free_sq_matrix_shared(int **A, size_t size) {
+    munmap(A[0], size * size * sizeof(int));
+    munmap(A, size * sizeof(int *));
 }
 
 // For matrix initalization, generate random integers in the entries. 
@@ -105,47 +151,4 @@ void print_sq_matrix(int **A, const char *name) {
         printf("\n");
     }
     printf("\n");
-}
-
-// Check to see if A and B have the same entires and are the same matrix or not. 
-bool same_matrix(int **A, int **B) {
-    for (size_t i = 0; A[i] != NULL; i++) {
-        for (size_t j = 0; A[j] != NULL; j++) {
-            if (A[i][j] != B[i][j]) return false;
-        }
-    }
-    return true; 
-}
-
-// Using Frievalds algorithm for checking matrix multiplication for MATRIX_SIZE > 2000.
-bool frievalds_verify(int **A, int **B, int **C, size_t size) {
-    int *r = (int *)malloc(size * sizeof(int));
-    int *B_r = (int *)malloc(size * sizeof(int));
-    int *C_r = (int *)malloc(size * sizeof(int));
-    int *AB_r = (int *)malloc(size * sizeof(int));
-
-    for (size_t i = 0; i < size; i++) {
-        r[i] = rand() % 2;
-    }
-
-    mult_sq_matrix_vec(B, r, B_r);
-    mult_sq_matrix_vec(C, r, C_r);
-    mult_sq_matrix_vec(A, B_r, AB_r);
-
-    for (size_t i = 0; i < size; i++) {
-        if (AB_r[i] != C_r[i]) {
-
-            free(r);
-            free(B_r);
-            free(C_r);
-            free(AB_r);
-            return false; 
-        }
-    }
-    
-    free(r);
-    free(B_r);
-    free(C_r);
-    free(AB_r);
-    return true; 
 }

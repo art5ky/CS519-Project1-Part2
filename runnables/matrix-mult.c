@@ -13,9 +13,14 @@
 #include "../headers/sqmatrix.h"
 #include "../headers/benchmark.h"
 
-#define MATRIX_SIZE 1000
+int arg_check(int argc, char *argv[]);
 
-int main() {
+int main(int argc, char *argv[]) {
+    int MATRIX_SIZE;
+
+    arg_check(argc, argv);
+
+    MATRIX_SIZE = atoi(argv[1]);
 
     srand(time(NULL));
     struct timespec start, end; 
@@ -40,10 +45,6 @@ int main() {
     double total_time_sec = get_total_time(start, end);
 
     bool verified = verified_matrix(A, B, C, MATRIX_SIZE);
-
-    //print_sq_matrix(A, "A");
-    //print_sq_matrix(B, "B");
-    //print_sq_matrix(C, "C");
    
     print_stats(MATRIX_SIZE, 1, verified, total_time_sec);
 
@@ -51,4 +52,19 @@ int main() {
     free_sq_matrix(B);
     free_sq_matrix(C);
     return 0; 
+}
+
+// Instead of using macros, I made it easier to just include arguments into the pipe program.
+int arg_check(int argc, char *argv[]) {
+     if (argc <= 1) {
+        printf("Usage: %s [MATRIX_SIZE]\n", argv[0]);
+        printf("---------------------------------------------------------------------------------\n");
+        printf("MATRIX_SIZE - Set a matrix size                                     (2 - 10000)\n");
+        exit(1); 
+    }
+
+    if (atoi(argv[1]) < 2 || atoi(argv[1]) > 10000) {
+        printf("Incompatible MATRIX_SIZE! (2 - 10000)\n");
+        exit(1); 
+    }
 }

@@ -1,10 +1,12 @@
 /*  CS519, Spring 2026: Project 1 - Part 2
     Written by: Arthur Levitsky
+    Benchmarking tools which includes checking matrix correctness.
 */
 
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "../headers/sqmatrix.h"
 
 void print_stats(int matrix_size, int num_processes, bool verified, double elapsed) {
@@ -16,6 +18,49 @@ void print_stats(int matrix_size, int num_processes, bool verified, double elaps
 
 double get_total_time(struct timespec start, struct timespec end) {
     return (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+}
+
+// Check to see if A and B have the same entires and are the same matrix or not. 
+bool same_matrix(int **A, int **B) {
+    for (size_t i = 0; A[i] != NULL; i++) {
+        for (size_t j = 0; A[j] != NULL; j++) {
+            if (A[i][j] != B[i][j]) return false;
+        }
+    }
+    return true; 
+}
+
+// Using Frievalds algorithm for checking matrix multiplication for MATRIX_SIZE > 2000.
+bool frievalds_verify(int **A, int **B, int **C, size_t size) {
+    int *r = (int *)malloc(size * sizeof(int));
+    int *B_r = (int *)malloc(size * sizeof(int));
+    int *C_r = (int *)malloc(size * sizeof(int));
+    int *AB_r = (int *)malloc(size * sizeof(int));
+
+    for (size_t i = 0; i < size; i++) {
+        r[i] = rand() % 2;
+    }
+
+    mult_sq_matrix_vec(B, r, B_r);
+    mult_sq_matrix_vec(C, r, C_r);
+    mult_sq_matrix_vec(A, B_r, AB_r);
+
+    for (size_t i = 0; i < size; i++) {
+        if (AB_r[i] != C_r[i]) {
+
+            free(r);
+            free(B_r);
+            free(C_r);
+            free(AB_r);
+            return false; 
+        }
+    }
+    
+    free(r);
+    free(B_r);
+    free(C_r);
+    free(AB_r);
+    return true; 
 }
 
 bool verified_matrix(int **A, int **B, int **C, size_t size) {
