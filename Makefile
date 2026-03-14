@@ -21,7 +21,7 @@ $(TARGET_SP): $(RUN_DIR)/sp_mmult.c $(COMMON_SRCS)
 $(TARGET_PIPE): $(RUN_DIR)/ipc-pipe.c $(COMMON_SRCS) $(LOCKS_SRC)
 	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/$@
 
-$(TARGET_SHMEM): $(RUN_DIR)/ipc-shmem.c $(COMMON_SRCS) $(LOCKS_SRC)
+$(TARGET_SHMEM): $(RUN_DIR)/ipc-shmem.c $(COMMON_SRCS)
 	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/$@
 
 clean:
