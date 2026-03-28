@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
     
     
     // unlike with pipes, the matrices have been allocated and delivered into a shared space.
-    int **A = malloc_sq_matrix_shared(MATRIX_SIZE);
-    int **B = malloc_sq_matrix_shared(MATRIX_SIZE);
+    int **A = malloc_sq_matrix(MATRIX_SIZE);
+    int **B = malloc_sq_matrix(MATRIX_SIZE);
     int **B_T = NULL; 
     int **C = malloc_sq_matrix_shared(MATRIX_SIZE);
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     zero_init_sq_matrix(C);
 
     if (USE_TRANSPOSE) {
-        B_T = malloc_sq_matrix_shared(MATRIX_SIZE);
+        B_T = malloc_sq_matrix(MATRIX_SIZE);
         if (B_T == NULL) {
             fprintf(stderr, "Allocation for transposed matrix failed. Exiting...");
         }
