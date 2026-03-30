@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
         transpose_sq_matrix(B, B_T);
     }
 
+    
+
     // Create the shared pipe among child processes.
     int pipefd[2];
     if (pipe(pipefd) == -1) {

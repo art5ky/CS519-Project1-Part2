@@ -113,7 +113,7 @@ void mult_sq_matrix_vec(int **A, int *v, int *A_v) {
 void transpose_sq_matrix(int **A, int **A_T) {
     for (size_t i = 0; A[i] != NULL; i++) {
         for (size_t j = 0; A[j] != NULL; j++) {
-            A[j][i] = A_T[i][j];
+            A_T[j][i] = A[i][j];
         }
     }
 }
