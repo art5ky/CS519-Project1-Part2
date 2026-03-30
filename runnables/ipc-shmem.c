@@ -16,6 +16,7 @@
 
 #include "../headers/sqmatrix.h"
 #include "../headers/benchmark.h"
+#include "../headers/locks.h"
 
 void safe_read(int fd, void *buf, size_t count);
 void arg_check(int argc, char *argv[]);
