@@ -58,7 +58,7 @@ void free_sq_matrix(int **A) {
 
 void free_sq_matrix_shared(int **A, size_t size) {
     munmap(A[0], size * size * sizeof(int));
-    munmap(A, size * sizeof(int *));
+    munmap(A, (size + 1) * sizeof(int *));
 }
 
 // For matrix initalization, generate random integers in the entries. 
