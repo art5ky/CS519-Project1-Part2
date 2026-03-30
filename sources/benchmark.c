@@ -21,9 +21,9 @@ double get_total_time(struct timespec start, struct timespec end) {
 }
 
 // Check to see if A and B have the same entires and are the same matrix or not. 
-bool same_matrix(int **A, int **B) {
-    for (size_t i = 0; A[i] != NULL; i++) {
-        for (size_t j = 0; A[j] != NULL; j++) {
+bool same_matrix(int **A, int **B, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        for (size_t j = 0; j < size; j++) {
             if (A[i][j] != B[i][j]) return false;
         }
     }
@@ -41,9 +41,9 @@ bool frievalds_verify(int **A, int **B, int **C, size_t size) {
         r[i] = rand() % 2;
     }
 
-    mult_sq_matrix_vec(B, r, B_r);
-    mult_sq_matrix_vec(C, r, C_r);
-    mult_sq_matrix_vec(A, B_r, AB_r);
+    mult_sq_matrix_vec(B, r, B_r, size);
+    mult_sq_matrix_vec(C, r, C_r, size);
+    mult_sq_matrix_vec(A, B_r, AB_r, size);
 
     for (size_t i = 0; i < size; i++) {
         if (AB_r[i] != C_r[i]) {
@@ -66,14 +66,14 @@ bool frievalds_verify(int **A, int **B, int **C, size_t size) {
 bool verified_matrix(int **A, int **B, int **C, size_t size) {
     if (size <= 1000) {
         int **prod_matrix = malloc_sq_matrix(size);
-        zero_init_sq_matrix(prod_matrix);
+        zero_init_sq_matrix(prod_matrix, size);
 
         if (prod_matrix == NULL) {
             fprintf(stderr, "Allocation for matrix D failed!");
             return false; 
         }
-        mult_sq_matrices_full(A, B, prod_matrix);
-        bool verified = same_matrix(C, prod_matrix);
+        mult_sq_matrices_full(A, B, prod_matrix, size);
+        bool verified = same_matrix(C, prod_matrix, size);
         free_sq_matrix(prod_matrix);
         return verified;
     } else {

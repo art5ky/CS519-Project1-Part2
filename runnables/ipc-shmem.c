@@ -41,8 +41,8 @@ int main(int argc, char *argv[]) {
     
     
     // unlike with pipes, the matrices have been allocated and delivered into a shared space.
-    int **A = malloc_sq_matrix_shared(MATRIX_SIZE);
-    int **B = malloc_sq_matrix_shared(MATRIX_SIZE);
+    int **A = malloc_sq_matrix(MATRIX_SIZE);
+    int **B = malloc_sq_matrix(MATRIX_SIZE);
     int **B_T = NULL; 
     int **C = malloc_sq_matrix_shared(MATRIX_SIZE);
 
@@ -51,16 +51,16 @@ int main(int argc, char *argv[]) {
         return 1; 
     }
     
-    rand_init_sq_matrix(A);
-    rand_init_sq_matrix(B);
-    zero_init_sq_matrix(C);
+    rand_init_sq_matrix(A, MATRIX_SIZE);
+    rand_init_sq_matrix(B, MATRIX_SIZE);
+    zero_init_sq_matrix(C, MATRIX_SIZE);
 
     if (USE_TRANSPOSE) {
-        B_T = malloc_sq_matrix_shared(MATRIX_SIZE);
+        B_T = malloc_sq_matrix(MATRIX_SIZE);
         if (B_T == NULL) {
             fprintf(stderr, "Allocation for transposed matrix failed. Exiting...");
         }
-        transpose_sq_matrix(B, B_T);
+        transpose_sq_matrix(B, B_T, MATRIX_SIZE);
     }
 
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -82,8 +82,8 @@ int main(int argc, char *argv[]) {
             
             // Because each process is working on it's own row of the C matrix, there is no contentions therefore locks are not needed.
             for (int r = start_row; r < end_row; r++) {
-                if (USE_TRANSPOSE) mult_sq_matrices_row_transposed(r, A, B_T, C);
-                else mult_sq_matrices_row(r, A, B, C);
+                if (USE_TRANSPOSE) mult_sq_matrices_row_transposed(r, A, B_T, C, MATRIX_SIZE);
+                else mult_sq_matrices_row(r, A, B, C, MATRIX_SIZE);
             }
             exit(0); 
         }

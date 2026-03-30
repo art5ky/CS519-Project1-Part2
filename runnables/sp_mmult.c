@@ -34,12 +34,12 @@ int main(int argc, char *argv[]) {
         return 1; 
     }
     
-    rand_init_sq_matrix(A);
-    rand_init_sq_matrix(B);
-    zero_init_sq_matrix(C);
+    rand_init_sq_matrix(A, MATRIX_SIZE);
+    rand_init_sq_matrix(B, MATRIX_SIZE);
+    zero_init_sq_matrix(C, MATRIX_SIZE);
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    mult_sq_matrices_full(A, B, C);
+    mult_sq_matrices_full(A, B, C, MATRIX_SIZE);
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     double total_time_sec = get_total_time(start, end);

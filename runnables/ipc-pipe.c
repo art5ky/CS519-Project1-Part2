@@ -49,19 +49,19 @@ int main(int argc, char *argv[]) {
         return 1; 
     }
     
-    rand_init_sq_matrix(A);
-    rand_init_sq_matrix(B);
-    zero_init_sq_matrix(C);
+    rand_init_sq_matrix(A, MATRIX_SIZE);
+    rand_init_sq_matrix(B, MATRIX_SIZE);
+    zero_init_sq_matrix(C, MATRIX_SIZE);
 
     if (USE_TRANSPOSE) {
         B_T = malloc_sq_matrix(MATRIX_SIZE);
         if (B_T == NULL) {
             fprintf(stderr, "Allocation for transposed matrix failed. Exiting...");
         }
-        transpose_sq_matrix(B, B_T);
+        transpose_sq_matrix(B, B_T, MATRIX_SIZE);
     }
 
-    
+
 
     // Create the shared pipe among child processes.
     int pipefd[2];
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
             end_row = start_row + base_rows + (i < remainder ? 1 : 0);
 
             for (int r = start_row; r < end_row; r++) {
-                if (USE_TRANSPOSE) mult_sq_matrices_row_transposed(r, A, B_T, C);
-                else mult_sq_matrices_row(r, A, B, C);
+                if (USE_TRANSPOSE) mult_sq_matrices_row_transposed(r, A, B_T, C, MATRIX_SIZE);
+                else mult_sq_matrices_row(r, A, B, C, MATRIX_SIZE);
                 
                 // Child reserves the lock and writes to the pipe buffer. It includes the row index and column of integers computed.
                 if (USE_TICKETLOCK) tl_acquire(lock);

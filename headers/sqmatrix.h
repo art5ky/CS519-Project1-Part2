@@ -13,15 +13,15 @@ int** malloc_sq_matrix_shared(size_t size);
 void free_sq_matrix(int **A);
 void free_sq_matrix_shared(int **A, size_t size);
 
-void rand_init_sq_matrix(int **A);
-void zero_init_sq_matrix(int **A);
+void rand_init_sq_matrix(int **A, size_t size);
+void zero_init_sq_matrix(int **A, size_t size);
 
-void mult_sq_matrices_full(int **A, int **B, int **C);
-void mult_sq_matrices_row(int row, int **A, int **B, int **C);
-void mult_sq_matrix_vec(int **A, int *v, int *A_v);
+void mult_sq_matrices_full(int **A, int **B, int **C, size_t size);
+void mult_sq_matrices_row(int row, int **A, int **B, int **C, size_t size);
+void mult_sq_matrix_vec(int **A, int *v, int *A_v, size_t size);
 
-void transpose_sq_matrix(int **A, int **A_T);
-void mult_sq_matrices_row_transposed(int row, int **A, int **B, int **C);
-void print_sq_matrix(int **A, const char *name);
+void transpose_sq_matrix(int **A, int **A_T, size_t size);
+void mult_sq_matrices_row_transposed(int row, int **A, int **B, int **C, size_t size);
+void print_sq_matrix(int **A, const char *name, size_t size);
 
 #endif 
